@@ -1,4 +1,4 @@
-package nl.hva.viewradar.viewradar;
+package nl.hva.viewradar;
 
 import android.content.Intent;
 import android.util.Log;
