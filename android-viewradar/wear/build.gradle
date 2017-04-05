@@ -6,7 +6,7 @@ android {
     buildToolsVersion "25.0.2"
 
     defaultConfig {
-        applicationId "net.dheera.wearcamera"
+        applicationId "nl.hva.viewradar"
         minSdkVersion 20
         targetSdkVersion 25
         versionCode 12

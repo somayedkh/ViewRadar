@@ -1,4 +1,4 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

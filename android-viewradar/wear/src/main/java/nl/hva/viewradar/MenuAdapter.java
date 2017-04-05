@@ -1,4 +1,4 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.util.Log;
 import android.view.View;
+
+import net.dheera.viewradar.R;
+
 public class MenuAdapter extends FragmentGridPagerAdapter {
 
     private final Context mContext;

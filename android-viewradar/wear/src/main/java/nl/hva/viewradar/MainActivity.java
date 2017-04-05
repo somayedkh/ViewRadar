@@ -1,8 +1,7 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,12 +10,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.support.wearable.view.GridViewPager;
-import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,9 +24,10 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import net.dheera.viewradar.R;
+
 import java.util.Scanner;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 

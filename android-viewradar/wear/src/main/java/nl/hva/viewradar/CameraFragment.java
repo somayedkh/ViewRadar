@@ -1,4 +1,4 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import net.dheera.viewradar.R;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 

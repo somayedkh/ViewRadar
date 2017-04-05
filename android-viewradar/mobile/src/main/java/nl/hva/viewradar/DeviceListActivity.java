@@ -1,4 +1,4 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
 import java.util.Set;
 import android.app.Activity;
@@ -15,6 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
+import net.dheera.viewradar.R;
 
 
 public class DeviceListActivity extends Activity {

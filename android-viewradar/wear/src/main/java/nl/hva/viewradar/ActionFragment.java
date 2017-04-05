@@ -1,8 +1,6 @@
-package net.dheera.wearcamera;
+package nl.hva.viewradar.viewradar;
 
-import android.app.ActionBar;
 import android.app.Fragment;
-import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,9 +8,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import net.dheera.viewradar.R;
 
 public class ActionFragment extends Fragment {
     private View.OnClickListener mOnClickListener;
