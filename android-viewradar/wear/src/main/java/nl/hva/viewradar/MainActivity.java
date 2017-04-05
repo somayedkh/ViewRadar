@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
     private static int currentTimer = 0;
     private int frameNumber = 0;
     private boolean timerIsRunning = false;
-    private boolean faceDetected = false;
+    private boolean objectDetected = false;
 
     private MessageApi.MessageListener mMessageListener = new MessageApi.MessageListener() {
         @Override
@@ -319,18 +319,18 @@ public class MainActivity extends Activity {
                         }
                     });
                 } else {
-                    faceDetected = true;
+                    objectDetected = true;
                 }
             }
         });
     }
 
-    public boolean isFaceDetected() {
-        return faceDetected;
+    public boolean isObjectDetected() {
+        return objectDetected;
     }
 
     public boolean setFaceDetected(boolean pDetected) {
-        return faceDetected = pDetected;
+        return objectDetected = pDetected;
     }
 
     private final Handler mHandler = new Handler() {

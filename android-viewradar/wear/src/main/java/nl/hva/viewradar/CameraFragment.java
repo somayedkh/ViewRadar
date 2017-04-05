@@ -45,7 +45,7 @@ public class CameraFragment extends Fragment {
             @Override
             public void run() {
                 if (getActivity() != null) {
-                    if (((MainActivity) getActivity()).isFaceDetected() && !showWarning) {
+                    if (((MainActivity) getActivity()).isObjectDetected() && !showWarning) {
                         showWarning = true;
                         setWarningScreen();
                     }

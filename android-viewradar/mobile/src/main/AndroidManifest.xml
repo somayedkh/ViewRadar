@@ -15,18 +15,18 @@
         android:theme="@style/AppTheme" >
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <activity
-            android:name="net.dheera.viewradar.nl.hva.viewradar.viewradar.MainActivity"
+            android:name="nl.hva.viewradar.MainActivity"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"
             android:launchMode="singleTask"
             android:label="@string/app_name" >
         </activity>
-        <activity android:name="net.dheera.viewradar.nl.hva.viewradar.viewradar.DeviceListActivity">
+        <activity android:name="nl.hva.viewradar.DeviceListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="net.dheera.viewradar.nl.hva.viewradar.viewradar.DataLayerListenerService">
+        <service android:name="nl.hva.viewradar.DataLayerListenerService">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>

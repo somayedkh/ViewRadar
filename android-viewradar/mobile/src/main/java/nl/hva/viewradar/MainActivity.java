@@ -66,6 +66,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private GoogleApiClient mGoogleApiClient;
     private Node mWearableNode = null;
     private boolean readyToProcessImage = true;
+    private boolean appStarted = false;
 
     private static int currentCamera = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
@@ -200,11 +201,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     if (totalLength > 3) {
                         String newString = recDataString.substring(totalLength - 4, totalLength - 2);
                         mTextview.setText(newString);
-                        if (Integer.parseInt(newString) < 50 && Integer.parseInt(newString) > 10) {
+                        Log.d(TAG, "Distance: " + newString);
+                        if (Integer.parseInt(newString) < 60 && Integer.parseInt(newString) > 10) {
                                 boolean[] detected = {true};
                                 // add function to draw rects on view/surface/canvas
+
+                            if (!appStarted) {
+                                appStarted = true;
                                 sendToWearable("start", toBytes(detected), null);
-                                sendToWearable("result", toBytes(detected), null);
+                            }
+                            sendToWearable("result", toBytes(detected), null);
                         }
                     } else {
                         mTextview.setText(recDataString);
@@ -403,44 +409,46 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                             try {
                                 Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
 
-                                int[] rgb = decodeYUV420SP(data, previewSize.width, previewSize.height);
-                                Bitmap bmp = Bitmap.createBitmap(rgb, previewSize.width, previewSize.height, Bitmap.Config.ARGB_8888);
-                                int smallWidth, smallHeight;
-                                int dimension = 200;
-                                // stream is lagging, cut resolution and catch up
-                                if(displayTimeLag > 1500) {
-                                    dimension = 50;
-                                } else if(displayTimeLag > 500) {
-                                    dimension = 100;
-                                } else {
-                                    dimension = 200;
-                                }
-                                if(previewSize.width > previewSize.height) {
-                                    smallWidth = dimension;
-                                    smallHeight = dimension*previewSize.height/previewSize.width;
-                                } else {
-                                    smallHeight = dimension;
-                                    smallWidth = dimension*previewSize.width/previewSize.height;
-                                }
-
-                                Matrix matrix = new Matrix();
-                                matrix.postRotate(mCameraOrientation);
-
-                                Bitmap bmpSmall = Bitmap.createScaledBitmap(bmp, smallWidth, smallHeight, false);
-                                Bitmap bmpSmallRotated = Bitmap.createBitmap(bmpSmall, 0, 0, smallWidth, smallHeight, matrix, false);
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                bmpSmallRotated.compress(Bitmap.CompressFormat.WEBP, 30, baos);
-                                displayFrameLag++;
-                                sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
-                                    @Override
-                                    public void onResult(MessageApi.SendMessageResult result) {
-                                        if(displayFrameLag>0) displayFrameLag--;
+                                if (previewSize != null) {
+                                    int[] rgb = decodeYUV420SP(data, previewSize.width, previewSize.height);
+                                    Bitmap bmp = Bitmap.createBitmap(rgb, previewSize.width, previewSize.height, Bitmap.Config.ARGB_8888);
+                                    int smallWidth, smallHeight;
+                                    int dimension = 200;
+                                    // stream is lagging, cut resolution and catch up
+                                    if (displayTimeLag > 1500) {
+                                        dimension = 50;
+                                    } else if (displayTimeLag > 500) {
+                                        dimension = 100;
+                                    } else {
+                                        dimension = 200;
                                     }
-                                });
-                                bmp.recycle();
-                                bmpSmall.recycle();
-                                bmpSmallRotated.recycle();
-                                readyToProcessImage = true;
+                                    if (previewSize.width > previewSize.height) {
+                                        smallWidth = dimension;
+                                        smallHeight = dimension * previewSize.height / previewSize.width;
+                                    } else {
+                                        smallHeight = dimension;
+                                        smallWidth = dimension * previewSize.width / previewSize.height;
+                                    }
+
+                                    Matrix matrix = new Matrix();
+                                    matrix.postRotate(mCameraOrientation);
+
+                                    Bitmap bmpSmall = Bitmap.createScaledBitmap(bmp, smallWidth, smallHeight, false);
+                                    Bitmap bmpSmallRotated = Bitmap.createBitmap(bmpSmall, 0, 0, smallWidth, smallHeight, matrix, false);
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    bmpSmallRotated.compress(Bitmap.CompressFormat.WEBP, 30, baos);
+                                    displayFrameLag++;
+                                    sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
+                                        @Override
+                                        public void onResult(MessageApi.SendMessageResult result) {
+                                            if (displayFrameLag > 0) displayFrameLag--;
+                                        }
+                                    });
+                                    bmp.recycle();
+                                    bmpSmall.recycle();
+                                    bmpSmallRotated.recycle();
+                                    readyToProcessImage = true;
+                                }
                             } catch (RuntimeExecutionException e) {
                                 //Do nothing
                             }
@@ -459,8 +467,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mCamera = Camera.open(currentCamera);
-        MyFaceDetectionListener fDListener = new MyFaceDetectionListener();
-        mCamera.setFaceDetectionListener(fDListener);
+//        MyFaceDetectionListener fDListener = new MyFaceDetectionListener();
+//        mCamera.setFaceDetectionListener(fDListener);
     }
 
     @Override
@@ -535,35 +543,35 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         doSwitch(currentCamera);
     }
 
-    private class MyFaceDetectionListener implements Camera.FaceDetectionListener {
-
-        @Override
-        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-            if (faces.length == 0) {
-                Log.i(TAG, "No faces detected");
-            } else if (faces.length > 0) {
-                Log.i(TAG, "Faces Detected = " +
-                        String.valueOf(faces.length));
-                boolean[] detected = {true};
-
-                List<Rect> faceRects;
-                faceRects = new ArrayList<Rect>();
-
-                for (int i=0; i<faces.length; i++) {
-                    int left = faces[i].rect.left;
-                    int right = faces[i].rect.right;
-                    int top = faces[i].rect.top;
-                    int bottom = faces[i].rect.bottom;
-                    Rect uRect = new Rect(left, top, right, bottom);
-                    faceRects.add(uRect);
-                }
-
-                // add function to draw rects on view/surface/canvas
-                //sendToWearable("start", toBytes(detected), null);
-                //sendToWearable("result", toBytes(detected), null);
-            }
-        }
-    }
+//    private class MyFaceDetectionListener implements Camera.FaceDetectionListener {
+//
+//        @Override
+//        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+//            if (faces.length == 0) {
+//                Log.i(TAG, "No faces detected");
+//            } else if (faces.length > 0) {
+//                Log.i(TAG, "Faces Detected = " +
+//                        String.valueOf(faces.length));
+//                boolean[] detected = {true};
+//
+//                List<Rect> faceRects;
+//                faceRects = new ArrayList<Rect>();
+//
+//                for (int i=0; i<faces.length; i++) {
+//                    int left = faces[i].rect.left;
+//                    int right = faces[i].rect.right;
+//                    int top = faces[i].rect.top;
+//                    int bottom = faces[i].rect.bottom;
+//                    Rect uRect = new Rect(left, top, right, bottom);
+//                    faceRects.add(uRect);
+//                }
+//
+//                // add function to draw rects on view/surface/canvas
+//                //sendToWearable("start", toBytes(detected), null);
+//                //sendToWearable("result", toBytes(detected), null);
+//            }
+//        }
+//    }
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
 
@@ -630,7 +638,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             } catch (IOException e) {
                 //if you cannot write, close the application
                 Toast.makeText(getBaseContext(), "Connection Failure", Toast.LENGTH_LONG).show();
-                finish();
+                //finish();
 
             }
         }
