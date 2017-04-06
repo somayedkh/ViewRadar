@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.fragments;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
@@ -12,7 +12,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
+
+import nl.hva.viewradar.activities.MainActivity;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 

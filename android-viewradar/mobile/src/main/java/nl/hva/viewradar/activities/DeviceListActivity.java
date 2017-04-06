@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.activities;
 
 import java.util.Set;
 import android.app.Activity;
@@ -11,12 +11,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
+
+import nl.hva.viewradar.utils.PreferenceUtils;
 
 
 public class DeviceListActivity extends Activity {
@@ -28,6 +32,7 @@ public class DeviceListActivity extends Activity {
     // declare button for launching website and textview for connection status
     Button tlbutton;
     TextView textView1;
+    CheckBox mCheckBox;
 
     // EXTRA string to send on to mainactivity
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -40,6 +45,17 @@ public class DeviceListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.device_list);
+
+        mCheckBox = (CheckBox) findViewById(R.id.checkBox);
+
+        mCheckBox.setChecked(PreferenceUtils.getInstance().cameraOn());
+
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                PreferenceUtils.getInstance().showCamera(b);
+            }
+        });
     }
 
     @Override

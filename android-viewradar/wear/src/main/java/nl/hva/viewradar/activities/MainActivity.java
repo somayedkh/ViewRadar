@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,10 +24,12 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
 
 import java.util.Scanner;
 import java.util.Timer;
+
+import nl.hva.viewradar.adapters.MenuAdapter;
 
 public class MainActivity extends Activity {
 
@@ -212,77 +214,12 @@ public class MainActivity extends Activity {
             });
     }
 
-    private static int currentFlash = 0;
-//    private void doFlash(int arg0) {
-//        currentFlash = arg0;
-//        sendToPhone("flash " + String.valueOf(arg0), null, null);
-//    }
-
     private static int currentCamera = 0;
 
     private void doSwitch(int arg0) {
         currentCamera = arg0;
         sendToPhone("switch " + String.valueOf(arg0), null, null);
     }
-
-//    private void doTimer(int arg0) {
-//        currentTimer = arg0;
-//    }
-
-//    private void takePicture() {
-//        if(mPhoneNode!=null) { sendToPhone("snap", null, null); }
-//        mMenuAdapter.mCameraFragment.cameraResult.animate().setDuration(500).translationX(mMenuAdapter.mCameraFragment.cameraResult.getWidth()).rotation(40).withEndAction(new Runnable() {
-//            public void run() {
-//                mMenuAdapter.mCameraFragment.cameraResult.setX(0);
-//                mMenuAdapter.mCameraFragment.cameraResult.setRotation(0);
-//            }
-//        });
-//    }
-
-//    private void startTimer(int seconds) {
-//        mMenuAdapter.mCameraFragment.cameraTime.setVisibility(View.VISIBLE);
-//        mTimer = new Timer();
-//        timerIsRunning = true;
-//        selfTimerSeconds = seconds + 1;
-//        mTimer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if(selfTimerSeconds-->0) {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mMenuAdapter.mCameraFragment.cameraTime.setText(String.valueOf(selfTimerSeconds));
-//                            mVibrator.vibrate(10);
-//                        }
-//                    });
-//                } else {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mMenuAdapter.mCameraFragment.cameraTime.setVisibility(View.GONE);
-//                            takePicture();
-//                            mVibrator.vibrate(200);
-//                        }
-//                    });
-//                    this.cancel();
-//                    timerIsRunning = false;
-//                }
-//            }
-//        }, 0, 1000);
-//    }
-//
-//    private void cancelTimer() {
-//        if(mTimer != null) {
-//            mTimer.cancel();
-//        }
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                mMenuAdapter.mCameraFragment.cameraTime.setVisibility(View.GONE);
-//            }
-//        });
-//        timerIsRunning = false;
-//    }
 
     private void sendToPhone(String path, byte[] data, final ResultCallback<MessageApi.SendMessageResult> callback) {
         if (mPhoneNode != null) {

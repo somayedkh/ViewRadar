@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.fragments;
 
 import android.app.Fragment;
 import android.graphics.drawable.ColorDrawable;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
 
 public class ActionFragment extends Fragment {
     private View.OnClickListener mOnClickListener;

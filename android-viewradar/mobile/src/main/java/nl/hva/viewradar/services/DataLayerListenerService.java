@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.services;
 
 import android.content.Intent;
 import android.util.Log;
@@ -8,10 +8,8 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 
-/**
- * Created by Dheera Venkatraman
- * http://dheera.net
- */
+import nl.hva.viewradar.activities.MainActivity;
+
 public class DataLayerListenerService extends WearableListenerService {
 
     private static final String TAG = "WearCameraListenerService";

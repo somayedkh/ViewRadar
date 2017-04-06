@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.activities;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -7,18 +7,16 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,18 +32,18 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import nl.hva.viewradar.utils.PreferenceUtils;
 
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback {
@@ -58,6 +56,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     private SurfaceHolder mSurfaceHolder;
     private SurfaceView mSurfaceView;
+    private CheckBox mCheckBox;
     private ImageView mImageView;
     private TextView mTextview;
     private Camera mCamera;
@@ -137,40 +136,22 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Watch
+        initViews();
+        setGoogleApiClient();
+        setArduinoBT();
+
+    }
+
+    public void initViews() {
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         mImageView = (ImageView) findViewById(R.id.imageView);
-        mTextview = (TextView) findViewById(R.id.textView);
+        //mTextview = (TextView) findViewById(R.id.textView);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(Bundle connectionHint) {
-                            if(D) Log.d(TAG, "onConnected: " + connectionHint);
-                            findWearableNode();
-                            Wearable.MessageApi.addListener(mGoogleApiClient, mMessageListener);
-                        }
-                        @Override
-                        public void onConnectionSuspended(int cause) {
-                            if(D) Log.d(TAG, "onConnectionSuspended: " + cause);
-                        }
-                    })
-                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                        @Override
-                        public void onConnectionFailed(ConnectionResult result) {
-                            if(D) Log.d(TAG, "onConnectionFailed: " + result);
-                        }
-                    })
-                    .addApi(Wearable.API)
-                    .build();
-            mGoogleApiClient.connect();
-
 
         // slowly subtract from the lag; in case the lag
         // is occurring due to transmission errors
@@ -190,8 +171,34 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 if(displayTimeLag>1000) { displayTimeLag-=1000; }
             }
         }, 0, 1000);
+    }
 
-        //Arduino BT
+    public void setGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle connectionHint) {
+                        if(D) Log.d(TAG, "onConnected: " + connectionHint);
+                        findWearableNode();
+                        Wearable.MessageApi.addListener(mGoogleApiClient, mMessageListener);
+                    }
+                    @Override
+                    public void onConnectionSuspended(int cause) {
+                        if(D) Log.d(TAG, "onConnectionSuspended: " + cause);
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult result) {
+                        if(D) Log.d(TAG, "onConnectionFailed: " + result);
+                    }
+                })
+                .addApi(Wearable.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+    public void setArduinoBT() {
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 if (msg.what == handlerState) {										//if message is what we want
@@ -203,7 +210,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                         if (allItems.length < 200) {
                             String newString = allItems[allItems.length - 2];
                             newString = newString.replaceAll("[\\r\\n]", "");
-                            mTextview.setText(newString);
+                            //mTextview.setText(newString);
 
                             Log.d(TAG, "allItems size: " + String.valueOf(allItems.length) + " | Distance: " + newString);
                             if (Integer.parseInt(newString) < 60 && Integer.parseInt(newString) > 0) {
@@ -212,7 +219,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
 //                                if (!appStarted) {
 //                                    appStarted = true;
-                                    sendToWearable("start", toBytes(detected), null);
+                                sendToWearable("start", toBytes(detected), null);
                                 //}
                                 sendToWearable("result", toBytes(detected), null);
                             }
@@ -408,12 +415,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                     bmpSmallRotated.compress(Bitmap.CompressFormat.WEBP, 30, baos);
                                     displayFrameLag++;
-                                    sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
-                                        @Override
-                                        public void onResult(MessageApi.SendMessageResult result) {
-                                            if (displayFrameLag > 0) displayFrameLag--;
-                                        }
-                                    });
+                                    if (PreferenceUtils.getInstance().cameraOn()) {
+                                        sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
+                                            @Override
+                                            public void onResult(MessageApi.SendMessageResult result) {
+                                                if (displayFrameLag > 0) displayFrameLag--;
+                                            }
+                                        });
+                                    }
                                     bmp.recycle();
                                     bmpSmall.recycle();
                                     bmpSmallRotated.recycle();
@@ -447,25 +456,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             mCamera.setPreviewCallback(null);
             mCamera.release();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public int[] decodeYUV420SP( byte[] yuv420sp, int width, int height) {

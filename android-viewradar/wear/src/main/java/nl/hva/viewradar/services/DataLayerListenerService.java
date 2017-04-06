@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.services;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;
@@ -11,6 +11,8 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.List;
+
+import nl.hva.viewradar.activities.MainActivity;
 
 /**
  * Created by Dheera Venkatraman

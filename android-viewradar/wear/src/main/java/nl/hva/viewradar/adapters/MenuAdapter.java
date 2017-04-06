@@ -1,4 +1,4 @@
-package nl.hva.viewradar;
+package nl.hva.viewradar.adapters;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -8,7 +8,10 @@ import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.util.Log;
 import android.view.View;
 
-import net.dheera.viewradar.R;
+import nl.hva.viewradar.R;
+
+import nl.hva.viewradar.fragments.ActionFragment;
+import nl.hva.viewradar.fragments.CameraFragment;
 
 public class MenuAdapter extends FragmentGridPagerAdapter {
 
