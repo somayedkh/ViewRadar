@@ -48,5 +48,6 @@ void loop()
 
    delay(50);
    unsigned int uS = sonar.ping_cm();
-   BT.print("|"+uS);
+   BT.println(uS);
+   BT.println("-");
 }

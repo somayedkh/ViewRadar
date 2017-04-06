@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private boolean readyToProcessImage = true;
     private boolean appStarted = false;
 
-    private static int currentCamera = Camera.CameraInfo.CAMERA_FACING_FRONT;
+    private static int currentCamera = Camera.CameraInfo.CAMERA_FACING_BACK;
 
     //
     private boolean showList = true;
@@ -195,45 +195,31 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         bluetoothIn = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 if (msg.what == handlerState) {										//if message is what we want
-                    String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                    String readMessage = (String) msg.obj;
+                    //Log.d(TAG, "Distance: " + readMessage);// msg.arg1 = bytes from connect thread
                     recDataString.append(readMessage);//keep appending to string until ~
-                    int totalLength = recDataString.length();
-                    if (totalLength > 3) {
-                        String newString = recDataString.substring(totalLength - 4, totalLength - 2);
-                        mTextview.setText(newString);
-                        Log.d(TAG, "Distance: " + newString);
-                        if (Integer.parseInt(newString) < 60 && Integer.parseInt(newString) > 10) {
+                    String[] allItems = recDataString.toString().split("-");
+                    if (allItems.length > 3) {
+                        if (allItems.length < 200) {
+                            String newString = allItems[allItems.length - 2];
+                            newString = newString.replaceAll("[\\r\\n]", "");
+                            mTextview.setText(newString);
+
+                            Log.d(TAG, "allItems size: " + String.valueOf(allItems.length) + " | Distance: " + newString);
+                            if (Integer.parseInt(newString) < 60 && Integer.parseInt(newString) > 0) {
                                 boolean[] detected = {true};
                                 // add function to draw rects on view/surface/canvas
 
-                            if (!appStarted) {
-                                appStarted = true;
-                                sendToWearable("start", toBytes(detected), null);
+//                                if (!appStarted) {
+//                                    appStarted = true;
+                                    sendToWearable("start", toBytes(detected), null);
+                                //}
+                                sendToWearable("result", toBytes(detected), null);
                             }
-                            sendToWearable("result", toBytes(detected), null);
+                        } else {
+                            recDataString = new StringBuilder();
                         }
-                    } else {
-                        mTextview.setText(recDataString);
                     }
-//                    int endOfLineIndex = recDataString.indexOf("\r\n");                    // determine the end-of-line
-//                    if (endOfLineIndex > 0) {                                           // make sure there data before ~
-//                        String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-//                        //txtString.setText("Data Received = " + dataInPrint);
-//                        int dataLength = dataInPrint.length();							//get length of data received
-//                        //txtStringLength.setText("String Length = " + String.valueOf(dataLength));
-//                        Log.d("info", dataInPrint);
-//                        if (recDataString.charAt(0) == '#')								//if it starts with # we know it is what we are looking for
-//                        {
-//                            String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
-//                            String sensor1 = recDataString.substring(6, 10);            //same again...
-//                            String sensor2 = recDataString.substring(11, 15);
-//                            String sensor3 = recDataString.substring(16, 20);
-//
-//                        }
-//                        recDataString.delete(0, recDataString.length()); 					//clear all string data
-//                        // strIncom =" ";
-//                        dataInPrint = " ";
-//                    }
                 }
             }
         };
@@ -276,22 +262,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             mCamera.setParameters(params);
             mCameraOrientation = resultB;
     }
-
-
-//    public void doFlash(int arg0) {
-//        if(arg0 == 0)
-//            currentFlashMode = Camera.Parameters.FLASH_MODE_OFF;
-//        else if(arg0 == 1)
-//            currentFlashMode = Camera.Parameters.FLASH_MODE_AUTO;
-//        else if(arg0 == 2)
-//            currentFlashMode = Camera.Parameters.FLASH_MODE_ON;
-//
-//        if((mCamera != null) && mPreviewRunning) {
-//            Camera.Parameters p = mCamera.getParameters();
-//            p.setFlashMode(currentFlashMode);
-//            mCamera.setParameters(p);
-//        }
-//    }
 
     public void doSwitch(int arg0) {
         Log.d(TAG, String.format("doSwitch(%d)", arg0));
@@ -467,8 +437,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mCamera = Camera.open(currentCamera);
-//        MyFaceDetectionListener fDListener = new MyFaceDetectionListener();
-//        mCamera.setFaceDetectionListener(fDListener);
     }
 
     @Override
@@ -543,36 +511,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         doSwitch(currentCamera);
     }
 
-//    private class MyFaceDetectionListener implements Camera.FaceDetectionListener {
-//
-//        @Override
-//        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
-//            if (faces.length == 0) {
-//                Log.i(TAG, "No faces detected");
-//            } else if (faces.length > 0) {
-//                Log.i(TAG, "Faces Detected = " +
-//                        String.valueOf(faces.length));
-//                boolean[] detected = {true};
-//
-//                List<Rect> faceRects;
-//                faceRects = new ArrayList<Rect>();
-//
-//                for (int i=0; i<faces.length; i++) {
-//                    int left = faces[i].rect.left;
-//                    int right = faces[i].rect.right;
-//                    int top = faces[i].rect.top;
-//                    int bottom = faces[i].rect.bottom;
-//                    Rect uRect = new Rect(left, top, right, bottom);
-//                    faceRects.add(uRect);
-//                }
-//
-//                // add function to draw rects on view/surface/canvas
-//                //sendToWearable("start", toBytes(detected), null);
-//                //sendToWearable("result", toBytes(detected), null);
-//            }
-//        }
-//    }
-
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
 
         return  device.createRfcommSocketToServiceRecord(BTMODULEUUID);
@@ -637,7 +575,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
             } catch (IOException e) {
                 //if you cannot write, close the application
-                Toast.makeText(getBaseContext(), "Connection Failure", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getBaseContext(), "Connection Failure", Toast.LENGTH_LONG).show();
                 //finish();
 
             }
