@@ -22,8 +22,6 @@ public class CameraFragment extends Fragment {
     private View.OnClickListener mOnClickListener;
 
     public ImageView cameraPreview = null;
-    public ImageView cameraResult;
-    public TextView cameraTime;
     public LinearLayout overlayLayout;
     public TextView overlayTitle;
     public TextView overlayClose;
@@ -34,8 +32,6 @@ public class CameraFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.camera, container, false);
         cameraPreview = (ImageView) contentView.findViewById(R.id.camera_preview);
-        cameraTime = (TextView) contentView.findViewById(R.id.camera_time);
-        cameraResult = (ImageView) contentView.findViewById(R.id.camera_result);
         overlayLayout = (LinearLayout) contentView.findViewById(R.id.overlay_layout);
         overlayTitle = (TextView) contentView.findViewById(R.id.overlay_title);
         overlayClose = (TextView) contentView.findViewById(R.id.overlay_close);
@@ -82,13 +78,21 @@ public class CameraFragment extends Fragment {
         //-1 - don't repeat
         final int indexInPatternToRepeat = -1;
         vibrator.vibrate(vibrationPattern, indexInPatternToRepeat);
-        ((MainActivity) getActivity()).setFaceDetected(false);
+        ((MainActivity) getActivity()).setObjectDetected(false);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 overlayTitle.setVisibility(View.GONE);
                 overlayClose.setVisibility(View.VISIBLE);
                 showWarning = false;
+                if (!((MainActivity) getActivity()).getCameraStatus()) {
+                    // Gets the layout params that will allow you to resize the layout
+                    ViewGroup.LayoutParams params = overlayTitle.getLayoutParams();
+                    // Changes the height and width to the specified *pixels*
+                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    overlayTitle.setLayoutParams(params);
+                }
             }
         }, 10000);
     }

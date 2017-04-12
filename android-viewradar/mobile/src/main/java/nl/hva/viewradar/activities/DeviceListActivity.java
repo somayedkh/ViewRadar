@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,7 +33,9 @@ public class DeviceListActivity extends Activity {
     // declare button for launching website and textview for connection status
     Button tlbutton;
     TextView textView1;
+    TextView mRangeTitle;
     CheckBox mCheckBox;
+    SeekBar mSeekBar;
 
     // EXTRA string to send on to mainactivity
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -47,6 +50,8 @@ public class DeviceListActivity extends Activity {
         setContentView(R.layout.device_list);
 
         mCheckBox = (CheckBox) findViewById(R.id.checkBox);
+        mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+        mRangeTitle = (TextView) findViewById(R.id.range_text);
 
         mCheckBox.setChecked(PreferenceUtils.getInstance().cameraOn());
 
@@ -54,6 +59,28 @@ public class DeviceListActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 PreferenceUtils.getInstance().showCamera(b);
+            }
+        });
+
+        mSeekBar.setProgress(PreferenceUtils.getInstance().getRange());
+        mRangeTitle.setText(getString(R.string.set_range, PreferenceUtils.getInstance().getRange()));
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                int realRange = i+20;
+                PreferenceUtils.getInstance().setRange(realRange);
+                mRangeTitle.setText(getString(R.string.set_range, realRange));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
     }

@@ -52,35 +52,42 @@ public class MainActivity extends Activity {
     private int frameNumber = 0;
     private boolean timerIsRunning = false;
     private boolean objectDetected = false;
+    private boolean cameraOn = false;
+
+    private Timer mTimer;
+
+    int selfTimerSeconds;
 
     private MessageApi.MessageListener mMessageListener = new MessageApi.MessageListener() {
         @Override
         public void onMessageReceived (MessageEvent m){
             Scanner s = new Scanner(m.getPath());
             String command = s.next();
-            if (command.equals("stop")) {
-                mPreviewRunning = false;
-                moveTaskToBack(true);
-            } else if (command.equals("start")) {
-                mPreviewRunning = true;
-            } else if (command.equals("show")) {
-                byte[] data = m.getData();
-                Bitmap bmpSmall = BitmapFactory.decodeByteArray(data, 0, data.length);
-                setBitmap(bmpSmall);
-                if(mPhoneNode != null && s.hasNextLong() && (frameNumber++%8) == 0) {
-                    sendToPhone(String.format("received %d", s.nextLong()), null, null);
-                }
-            } else if(command.equals("result")) {
-                if(D) Log.d(TAG, "result");
-                onMessageResult(m.getData());
+            switch (command) {
+                case "stop":
+                    mPreviewRunning = false;
+                    moveTaskToBack(true);
+                    break;
+                case "start":
+                    mPreviewRunning = true;
+                    break;
+                case "show":
+                    cameraOn = true;
+                    byte[] data = m.getData();
+                    Bitmap bmpSmall = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    setBitmap(bmpSmall);
+                    if (mPhoneNode != null && s.hasNextLong() && (frameNumber++ % 8) == 0) {
+                        sendToPhone(String.format("received %d", s.nextLong()), null, null);
+                    }
+                    break;
+                case "result":
+                    if (D) Log.d(TAG, "result");
+                    onMessageResult(m.getData());
+                    break;
             }
 
         }
     };
-
-    private Timer mTimer;
-
-    int selfTimerSeconds;
 
     void findPhoneNode() {
         PendingResult<NodeApi.GetConnectedNodesResult> pending = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient);
@@ -98,6 +105,10 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    public boolean getCameraStatus() {
+        return cameraOn;
     }
 
     @Override
@@ -140,6 +151,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initViews();
+        setGoogleApiClient();
+
+    }
+
+    public void initViews() {
         mMenuAdapter = new MenuAdapter(this, getFragmentManager(), mHandler);
         mGridViewPager = (GridViewPager) findViewById(R.id.pager);
         mGridViewPager.setAdapter(mMenuAdapter);
@@ -147,7 +164,9 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    }
 
+    public void setGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
@@ -171,8 +190,6 @@ public class MainActivity extends Activity {
                 .build();
 
         mGoogleApiClient.connect();
-
-
     }
 
     @Override
@@ -191,7 +208,7 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onResume");
         if(mPhoneNode != null) {
             sendToPhone("start", null, null);
-            doSwitch(currentCamera);
+            //doSwitch(currentCamera);
         } else {
             findPhoneNode();
         }
@@ -245,16 +262,16 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 if (data.length > 1) {
-                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    mMenuAdapter.mCameraFragment.cameraResult.setImageBitmap(bmp);
-                    mMenuAdapter.mCameraFragment.cameraResult.setTranslationX(0);
-                    mMenuAdapter.mCameraFragment.cameraResult.setRotation(0);
-                    mMenuAdapter.mCameraFragment.cameraResult.setVisibility(View.VISIBLE);
-                    mMenuAdapter.mCameraFragment.cameraResult.animate().setDuration(500).translationX(mMenuAdapter.mCameraFragment.cameraPreview.getWidth()).rotation(40).withEndAction(new Runnable() {
-                        public void run() {
-                            mMenuAdapter.mCameraFragment.cameraResult.setVisibility(View.GONE);
-                        }
-                    });
+//                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//                    mMenuAdapter.mCameraFragment.cameraResult.setImageBitmap(bmp);
+//                    mMenuAdapter.mCameraFragment.cameraResult.setTranslationX(0);
+//                    mMenuAdapter.mCameraFragment.cameraResult.setRotation(0);
+//                    mMenuAdapter.mCameraFragment.cameraResult.setVisibility(View.VISIBLE);
+//                    mMenuAdapter.mCameraFragment.cameraResult.animate().setDuration(500).translationX(mMenuAdapter.mCameraFragment.cameraPreview.getWidth()).rotation(40).withEndAction(new Runnable() {
+//                        public void run() {
+//                            mMenuAdapter.mCameraFragment.cameraResult.setVisibility(View.GONE);
+//                        }
+//                    });
                 } else {
                     objectDetected = true;
                 }
@@ -266,7 +283,7 @@ public class MainActivity extends Activity {
         return objectDetected;
     }
 
-    public boolean setFaceDetected(boolean pDetected) {
+    public boolean setObjectDetected(boolean pDetected) {
         return objectDetected = pDetected;
     }
 
@@ -274,26 +291,10 @@ public class MainActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MenuAdapter.MESSAGE_SNAP:
-                    Log.d(TAG, "MESSAGE_SNAP");
-                    mGridViewPager.scrollTo(0, 0);
-//                    if(currentTimer == 0) {
-//                        takePicture();
-//                    } else if(currentTimer == 1) {
-//                        if(timerIsRunning)
-//                            cancelTimer();
-//                        else
-//                            startTimer(5);
-//                    } else if(currentTimer == 2) {
-//                        if(timerIsRunning)
-//                            cancelTimer();
-//                        else
-//                            startTimer(10);
-//                    }
-                    break;
                 case MenuAdapter.MESSAGE_SWITCH:
                     Log.d(TAG, "MESSAGE_SWITCH");
                     doSwitch(msg.arg1);
+                    mGridViewPager.scrollTo(0, 0);
                     break;
             }
         }

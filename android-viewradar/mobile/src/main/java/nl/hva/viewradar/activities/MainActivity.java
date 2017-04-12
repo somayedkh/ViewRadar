@@ -57,7 +57,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private SurfaceHolder mSurfaceHolder;
     private SurfaceView mSurfaceView;
     private CheckBox mCheckBox;
-    private ImageView mImageView;
     private TextView mTextview;
     private Camera mCamera;
     public int mCameraOrientation;
@@ -93,17 +92,23 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             lastMessageTime = System.currentTimeMillis();
             Scanner s = new Scanner(m.getPath());
             String command = s.next();
-            if (command.equals("switch")) {
-                int arg0 = 0;
-                if (s.hasNextInt()) arg0 = s.nextInt();
-                doSwitch(arg0);
-            } else if(command.equals("received")) {
-                long arg0 = 0;
-                if(s.hasNextLong()) arg0 = s.nextLong();
-                displayTimeLag = System.currentTimeMillis() - arg0;
-                if(D) Log.d(TAG, String.format("frame lag time: %d ms", displayTimeLag));
-            } else if(command.equals("stop")) {
-                moveTaskToBack(true);
+            switch (command) {
+                case "switch": {
+                    int arg0 = 0;
+                    if (s.hasNextInt()) arg0 = s.nextInt();
+                    doSwitch(arg0);
+                    break;
+                }
+                case "received": {
+                    long arg0 = 0;
+                    if (s.hasNextLong()) arg0 = s.nextLong();
+                    displayTimeLag = System.currentTimeMillis() - arg0;
+                    if (D) Log.d(TAG, String.format("frame lag time: %d ms", displayTimeLag));
+                    break;
+                }
+                case "stop":
+                    moveTaskToBack(true);
+                    break;
             }
         }
     };
@@ -148,7 +153,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         mSurfaceHolder.addCallback(this);
         mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        mImageView = (ImageView) findViewById(R.id.imageView);
         //mTextview = (TextView) findViewById(R.id.textView);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -213,13 +217,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                             //mTextview.setText(newString);
 
                             Log.d(TAG, "allItems size: " + String.valueOf(allItems.length) + " | Distance: " + newString);
-                            if (Integer.parseInt(newString) < 60 && Integer.parseInt(newString) > 0) {
+                            if (Integer.parseInt(newString) < PreferenceUtils.getInstance().getRange() && Integer.parseInt(newString) > 0) {
                                 boolean[] detected = {true};
                                 // add function to draw rects on view/surface/canvas
 
 //                                if (!appStarted) {
 //                                    appStarted = true;
-                                sendToWearable("start", toBytes(detected), null);
+                                sendToWearable("start", null, null);
                                 //}
                                 sendToWearable("result", toBytes(detected), null);
                             }
@@ -327,6 +331,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         Log.d(TAG, "onResume");
         lastMessageTime = System.currentTimeMillis();
         super.onResume();
+
+        if(mPreviewRunning) {
+            surfaceCreated(mSurfaceHolder);
+            surfaceChanged(mSurfaceHolder, 0, 0, 0);
+        }
 
         //Get MAC address from DeviceListActivity via intent
         Intent intent = getIntent();

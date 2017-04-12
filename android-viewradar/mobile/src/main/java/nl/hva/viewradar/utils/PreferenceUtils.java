@@ -10,6 +10,7 @@ public class PreferenceUtils {
     private static final String KEY = "sharedPreferences";
     private static final String KEY_FIRST_RUN = "first_run";
     private static final String KEY_SHOW_CAMERA = "show_camera";
+    private static final String KEY_SENSOR_RANGE = "sensor_range";
 
     private static PreferenceUtils sInstance = new PreferenceUtils();
 
@@ -49,5 +50,17 @@ public class PreferenceUtils {
         return mSharedPreferences.getBoolean(KEY_SHOW_CAMERA, true);
     }
 
+    /**
+     * Save sensor range.
+     */
+    public void setRange(int range) {
+        mSharedPreferences.edit()
+                .putInt(KEY_SENSOR_RANGE, range)
+                .apply();
+    }
+
+    public int getRange() {
+        return mSharedPreferences.getInt(KEY_SENSOR_RANGE, 60);
+    }
 
 }
