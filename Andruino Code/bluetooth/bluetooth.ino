@@ -46,7 +46,7 @@ void loop()
     // you can add more "if" statements with other characters to add more commands
   }
 
-   delay(50);
+   delay(250);
    unsigned int uS = sonar.ping_cm();
    BT.println(uS);
    BT.println("-");

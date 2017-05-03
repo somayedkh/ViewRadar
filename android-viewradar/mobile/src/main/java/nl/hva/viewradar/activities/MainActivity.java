@@ -107,6 +107,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     break;
                 }
                 case "stop":
+                    appStarted = false;
                     moveTaskToBack(true);
                     break;
             }
@@ -218,14 +219,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
                             Log.d(TAG, "allItems size: " + String.valueOf(allItems.length) + " | Distance: " + newString);
                             if (Integer.parseInt(newString) < PreferenceUtils.getInstance().getRange() && Integer.parseInt(newString) > 0) {
-                                boolean[] detected = {true};
                                 // add function to draw rects on view/surface/canvas
 
-//                                if (!appStarted) {
-//                                    appStarted = true;
-                                sendToWearable("start", null, null);
-                                //}
-                                sendToWearable("result", toBytes(detected), null);
+                                if (!appStarted) {
+                                    appStarted = true;
+                                    sendToWearable("start", null, null);
+                                    //Start app
+                                    Intent startIntent = new Intent(MainActivity.this, MainActivity.class);
+                                    startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                    startActivity(startIntent);
+                                }
                             }
                         } else {
                             recDataString = new StringBuilder();
@@ -425,6 +428,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                                     bmpSmallRotated.compress(Bitmap.CompressFormat.WEBP, 30, baos);
                                     displayFrameLag++;
                                     if (PreferenceUtils.getInstance().cameraOn()) {
+                                        boolean[] detected = {true};
+                                        sendToWearable("result", toBytes(detected), null);
                                         sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
                                             @Override
                                             public void onResult(MessageApi.SendMessageResult result) {

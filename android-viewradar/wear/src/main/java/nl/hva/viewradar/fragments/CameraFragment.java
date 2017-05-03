@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ public class CameraFragment extends Fragment {
             @Override
             public void run() {
                 if (getActivity() != null) {
+                    Log.d("Watch cam", String.valueOf(((MainActivity) getActivity()).isObjectDetected()));
                     if (((MainActivity) getActivity()).isObjectDetected() && !showWarning) {
                         showWarning = true;
                         setWarningScreen();
@@ -85,14 +87,14 @@ public class CameraFragment extends Fragment {
                 overlayTitle.setVisibility(View.GONE);
                 overlayClose.setVisibility(View.VISIBLE);
                 showWarning = false;
-                if (!((MainActivity) getActivity()).getCameraStatus()) {
-                    // Gets the layout params that will allow you to resize the layout
-                    ViewGroup.LayoutParams params = overlayTitle.getLayoutParams();
-                    // Changes the height and width to the specified *pixels*
-                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                    overlayTitle.setLayoutParams(params);
-                }
+//                if (!((MainActivity) getActivity()).getCameraStatus()) {
+//                    // Gets the layout params that will allow you to resize the layout
+//                    ViewGroup.LayoutParams params = overlayTitle.getLayoutParams();
+//                    // Changes the height and width to the specified *pixels*
+//                    params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+//                    overlayTitle.setLayoutParams(params);
+//                }
             }
         }, 10000);
     }

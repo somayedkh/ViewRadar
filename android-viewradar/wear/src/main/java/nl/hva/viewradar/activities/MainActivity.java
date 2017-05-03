@@ -280,10 +280,12 @@ public class MainActivity extends Activity {
     }
 
     public boolean isObjectDetected() {
+        Log.d("Watch -isObjectDetected", String.valueOf(objectDetected));
         return objectDetected;
     }
 
     public boolean setObjectDetected(boolean pDetected) {
+        Log.d("Watch setObjectDetected", String.valueOf(pDetected));
         return objectDetected = pDetected;
     }
 
