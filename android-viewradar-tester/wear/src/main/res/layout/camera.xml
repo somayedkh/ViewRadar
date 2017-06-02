@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/white"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/overlay_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/overlay_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/action_background_color"
+            android:gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            tools:text="Yo Cor"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/overlay_close"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom|center"
+            android:text="Veeg naar rechts\nom af te sluiten."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</FrameLayout>

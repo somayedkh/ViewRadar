@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Viewrader</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="camera_startup">Camera aan bij het opstarten</string>
+    <string name="set_range">Stel de afstand voor de sensor in centimeter(nu %1$d cm):</string>
+    <string name="main_activity_text">Je kunt de app nu verlaten, maar sluit de app niet af!</string>
+    <string name="title_activity_splash">SplashActivity</string>
+
+</resources>
