@@ -96,7 +96,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 case "switch": {
                     int arg0 = 0;
                     if (s.hasNextInt()) arg0 = s.nextInt();
-                    doSwitch(arg0);
+                    //doSwitch(arg0);
                     break;
                 }
                 case "received": {
@@ -225,9 +225,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                                     appStarted = true;
                                     sendToWearable("start", null, null);
                                     //Start app
-                                    Intent startIntent = new Intent(MainActivity.this, MainActivity.class);
-                                    startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                    startActivity(startIntent);
+                                    if (PreferenceUtils.getInstance().cameraOn()) {
+                                        Intent startIntent = new Intent(MainActivity.this, MainActivity.class);
+                                        startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                        startActivity(startIntent);
+                                    }
                                 }
                             }
                         } else {
@@ -277,33 +279,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             mCameraOrientation = resultB;
     }
 
-    public void doSwitch(int arg0) {
-        Log.d(TAG, String.format("doSwitch(%d)", arg0));
-
-        int oldCurrentCamera = currentCamera;
-
-        if(Camera.getNumberOfCameras()>=2) {
-            if(arg0 == 1) {
-                currentCamera = Camera.CameraInfo.CAMERA_FACING_FRONT;
-            } else {
-                currentCamera = Camera.CameraInfo.CAMERA_FACING_BACK;
-            }
-        } else {
-            currentCamera = Camera.CameraInfo.CAMERA_FACING_FRONT;
-        }
-
-        if((oldCurrentCamera != currentCamera) && mPreviewRunning) {
-            surfaceDestroyed(mSurfaceHolder);
-            if (arg0 == 0) {
-                surfaceCreated(mSurfaceHolder);
-                surfaceChanged(mSurfaceHolder, 0, 0, 0);
-            } else {
-                surfaceCreated(mSurfaceHolder);
-                surfaceChanged(mSurfaceHolder, 0, 0, 0);
-            }
-        }
-    }
-
     private void sendToWearable(String path, byte[] data, final ResultCallback<MessageApi.SendMessageResult> callback) {
         if (mWearableNode != null) {
             PendingResult<MessageApi.SendMessageResult> pending = Wearable.MessageApi.sendMessage(mGoogleApiClient, mWearableNode.getId(), path, data);
@@ -334,8 +309,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         Log.d(TAG, "onResume");
         lastMessageTime = System.currentTimeMillis();
         super.onResume();
+        onDeviceConnect();
+    }
 
-        if(mPreviewRunning) {
+    public void onDeviceConnect() {
+        if(mPreviewRunning & PreferenceUtils.getInstance().cameraOn()) {
             surfaceCreated(mSurfaceHolder);
             surfaceChanged(mSurfaceHolder, 0, 0, 0);
         }
@@ -509,10 +487,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         return toReturn;
-    }
-
-    public void onClickSwitch(View view) {
-        doSwitch(currentCamera);
     }
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {

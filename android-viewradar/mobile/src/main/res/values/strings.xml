@@ -10,5 +10,6 @@
     <string name="camera_startup">Camera aan bij het opstarten</string>
     <string name="set_range">Stel de afstand voor de sensor in centimeter(nu %1$d cm):</string>
     <string name="main_activity_text">Je kunt de app nu verlaten, maar sluit de app niet af!</string>
+    <string name="title_activity_splash">SplashActivity</string>
 
 </resources>

@@ -19,10 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-import nl.hva.viewradar.R;
-
 import nl.hva.viewradar.utils.PreferenceUtils;
 
+import nl.hva.viewradar.R;
 
 public class DeviceListActivity extends Activity {
     // Debugging for LOGCAT
