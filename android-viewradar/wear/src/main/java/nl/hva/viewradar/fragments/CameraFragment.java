@@ -25,6 +25,7 @@ public class CameraFragment extends Fragment {
     public ImageView cameraPreview = null;
     public LinearLayout overlayLayout;
     public TextView overlayTitle;
+    public TextView overlayDefault;
     public TextView overlayClose;
 
     public Boolean showWarning = false;
@@ -32,13 +33,13 @@ public class CameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View contentView = inflater.inflate(R.layout.camera, container, false);
-        cameraPreview = (ImageView) contentView.findViewById(R.id.camera_preview);
+        //cameraPreview = (ImageView) contentView.findViewById(R.id.camera_preview);
         overlayLayout = (LinearLayout) contentView.findViewById(R.id.overlay_layout);
         overlayTitle = (TextView) contentView.findViewById(R.id.overlay_title);
+        overlayDefault = (TextView) contentView.findViewById(R.id.overlay_default);
         overlayClose = (TextView) contentView.findViewById(R.id.overlay_close);
-        cameraPreview.setOnClickListener(mOnClickListener);
+        //cameraPreview.setOnClickListener(mOnClickListener);
 
-        SharedPreferences preferences = getActivity().getPreferences(0);
         final Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
@@ -53,21 +54,6 @@ public class CameraFragment extends Fragment {
                 h.postDelayed(this, 10);
             }
         }, 10);
-//        if (preferences.getBoolean("tip0_hide", false) == false) {
-//            mImageView_tip = (TextView) contentView.findViewById(R.id.tip);
-//            //mImageView_tip.setImageResource(R.drawable.tip_0);
-//            mImageView_tip.setVisibility(View.VISIBLE);
-//            mImageView_tip.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mImageView_tip.setVisibility(View.GONE);
-//                    SharedPreferences preferences = getActivity().getPreferences(0);
-//                    SharedPreferences.Editor editor = preferences.edit();
-//                    editor.putBoolean("tip0_hide", true);
-//                    editor.commit();
-//                }
-//            });
-//        }
 
         return contentView;
     }
@@ -75,6 +61,7 @@ public class CameraFragment extends Fragment {
     public void setWarningScreen() {
         overlayTitle.setText("Pas op!");
         overlayTitle.setVisibility(View.VISIBLE);
+        overlayDefault.setVisibility(View.GONE);
         Vibrator vibrator = (Vibrator) getActivity().getSystemService(VIBRATOR_SERVICE);
         long[] vibrationPattern = {0, 1000, 50, 1000};
         //-1 - don't repeat

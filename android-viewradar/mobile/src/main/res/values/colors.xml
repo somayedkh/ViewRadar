@@ -3,4 +3,6 @@
     <color name="action_bar_background_color">#f0bababa</color>
     <color name="action_background_color">#ff2878ff</color>
     <color name="action_background_color_down">#ff195ccf</color>
+    <color name="colorPrimary">#3E50B3</color>
+    <color name="colorSecondary">#58A9E9</color>
 </resources>

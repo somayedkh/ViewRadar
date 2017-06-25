@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -29,11 +28,9 @@ public class DeviceListActivity extends Activity {
     private static final boolean D = true;
 
 
-    // declare button for launching website and textview for connection status
-    Button tlbutton;
-    TextView textView1;
+    // Textview for connection status
+    TextView mConnectText;
     TextView mRangeTitle;
-    CheckBox mCheckBox;
     SeekBar mSeekBar;
 
     // EXTRA string to send on to mainactivity
@@ -48,18 +45,18 @@ public class DeviceListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.device_list);
 
-        mCheckBox = (CheckBox) findViewById(R.id.checkBox);
+        //mCheckBox = (CheckBox) findViewById(R.id.checkBox);
         mSeekBar = (SeekBar) findViewById(R.id.seekBar);
         mRangeTitle = (TextView) findViewById(R.id.range_text);
 
-        mCheckBox.setChecked(PreferenceUtils.getInstance().cameraOn());
-
-        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                PreferenceUtils.getInstance().showCamera(b);
-            }
-        });
+//        mCheckBox.setChecked(PreferenceUtils.getInstance().cameraOn());
+//
+//        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                PreferenceUtils.getInstance().showCamera(b);
+//            }
+//        });
 
         mSeekBar.setProgress(PreferenceUtils.getInstance().getRange());
         mRangeTitle.setText(getString(R.string.set_range, PreferenceUtils.getInstance().getRange()));
@@ -91,9 +88,8 @@ public class DeviceListActivity extends Activity {
         //***************
         checkBTState();
 
-        textView1 = (TextView) findViewById(R.id.connecting);
-        textView1.setTextSize(40);
-        textView1.setText(" ");
+        mConnectText = (TextView) findViewById(R.id.connecting);
+        mConnectText.setText(" ");
 
         // Initialize array adapter for paired devices
         mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
@@ -125,7 +121,7 @@ public class DeviceListActivity extends Activity {
     private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3) {
 
-            textView1.setText("Connecting...");
+            mConnectText.setText(getString(R.string.connecting));
             // Get the device MAC address, which is the last 17 chars in the View
             String info = ((TextView) v).getText().toString();
             String address = info.substring(info.length() - 17);

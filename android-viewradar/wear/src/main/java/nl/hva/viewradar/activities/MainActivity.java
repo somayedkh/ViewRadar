@@ -97,9 +97,8 @@ public class MainActivity extends Activity {
                 if(result.getNodes().size()>0) {
                     mPhoneNode = result.getNodes().get(0);
                     if(D) Log.d(TAG, "Found wearable: name=" + mPhoneNode.getDisplayName() + ", id=" + mPhoneNode.getId());
-                    sendToPhone("start", null, null);
-                    doSwitch(currentCamera);
-                    //doFlash(currentFlash);
+                    //sendToPhone("start", null, null);
+                    //doSwitch(currentCamera);
                 } else {
                     mPhoneNode = null;
                 }
@@ -207,7 +206,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         Log.d(TAG, "onResume");
         if(mPhoneNode != null) {
-            sendToPhone("start", null, null);
+            //sendToPhone("start", null, null);
             //doSwitch(currentCamera);
         } else {
             findPhoneNode();

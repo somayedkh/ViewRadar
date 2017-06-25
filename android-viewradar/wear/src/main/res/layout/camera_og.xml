@@ -2,8 +2,23 @@
 <FrameLayout android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/colorSecondary"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/camera_preview"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:longClickable="true"
+        android:clickable="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tip_img"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/overlay_layout"
@@ -19,28 +34,18 @@
             android:gravity="center_horizontal"
             android:textColor="@color/white"
             android:textSize="24sp"
-            android:visibility="visible"
-            android:text="@string/viewradar" />
-
-        <TextView
-            android:id="@+id/overlay_default"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/overlay_default"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:visibility="visible" />
+            tools:text="Yo Cor"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/overlay_close"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="bottom|center"
-            android:text="@string/swipe_right"
-            android:textColor="@color/white"
+            android:text="Veeg naar rechts\nom af te sluiten."
             android:textSize="16sp"
-            android:visibility="gone" />
+            android:textColor="@color/white"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </FrameLayout>

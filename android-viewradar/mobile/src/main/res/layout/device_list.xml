@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorSecondary"
+    android:orientation="vertical">
 
-    <CheckBox
-        android:id="@+id/checkBox"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:text="@string/camera_startup" />
+        android:layout_height="?android:attr/actionBarSize"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_huge"/>
 
     <TextView
         android:id="@+id/range_text"
@@ -17,7 +20,8 @@
         android:layout_height="wrap_content"
         android:padding="5dp"
         android:text="@string/set_range"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:textColor="@android:color/white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +33,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="5dp"
-            android:text="20" />
+            android:text="20"
+            android:textColor="@android:color/white" />
 
         <SeekBar
             android:id="@+id/seekBar"
@@ -44,39 +49,42 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:padding="5dp"
-            android:text="180" />
+            android:text="180"
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
-    <TextView android:id="@+id/title_paired_devices"
+    <TextView
+        android:id="@+id/title_paired_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Select btSerial device from paired devices:"
-        android:visibility="visible"
-        android:background="#666"
-        android:textColor="#fff"
+        android:background="@color/colorPrimary"
         android:paddingLeft="5dp"
-        />
+        android:text="@string/select_device"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#fff"
+        android:visibility="visible" />
+
     <ListView android:id="@+id/paired_devices"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:stackFromBottom="false"
-        android:layout_weight="1"
-        />
+        tools:listitem="@layout/device_name"/>
 
     <TextView
         android:id="@+id/connecting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/white"/>
 
     <TextView
         android:id="@+id/infoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="If no devices are listed please pair your device in Android settings"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="@string/connect_device"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@android:color/white" />
 
     <LinearLayout
         android:layout_width="match_parent"

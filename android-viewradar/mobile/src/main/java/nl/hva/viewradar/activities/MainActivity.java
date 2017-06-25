@@ -46,7 +46,7 @@ import java.util.UUID;
 import nl.hva.viewradar.utils.PreferenceUtils;
 
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback {
+public class MainActivity extends Activity {
 
     private static final String TAG = "WearCamera";
     private static final boolean D = true;
@@ -133,6 +133,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     protected void onDestroy() {
         if(D) Log.d(TAG, "onDestroy");
         Wearable.MessageApi.removeListener(mGoogleApiClient, mMessageListener);
+        appStarted = false;
         super.onDestroy();
     }
 
@@ -151,8 +152,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     public void initViews() {
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         mSurfaceHolder = mSurfaceView.getHolder();
-        mSurfaceHolder.addCallback(this);
-        mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         //mTextview = (TextView) findViewById(R.id.textView);
 
@@ -225,12 +224,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                                     appStarted = true;
                                     sendToWearable("start", null, null);
                                     //Start app
-                                    if (PreferenceUtils.getInstance().cameraOn()) {
-                                        Intent startIntent = new Intent(MainActivity.this, MainActivity.class);
-                                        startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                        startActivity(startIntent);
-                                    }
+//                                    if (PreferenceUtils.getInstance().cameraOn()) {
+//                                        Intent startIntent = new Intent(MainActivity.this, MainActivity.class);
+//                                        startIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                                        startActivity(startIntent);
+//                                    }
+
                                 }
+                                boolean[] detected = {true};
+                                sendToWearable("result", toBytes(detected), null);
                             }
                         } else {
                             recDataString = new StringBuilder();
@@ -242,41 +244,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();       // get Bluetooth adapter
         checkBTState();
-    }
-
-    public void setCameraDisplayOrientation() {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            mCamera.getCameraInfo(currentCamera, info);
-            int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
-            int degrees = 0;
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-            int resultA = 0, resultB = 0;
-            if(currentCamera == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                resultA = (info.orientation - degrees + 360) % 360;
-                resultB = (info.orientation - degrees + 360) % 360;
-                mCamera.setDisplayOrientation(resultA);
-            } else {
-                resultA = (360 + 360 - info.orientation - degrees) % 360;
-                resultB = (info.orientation + degrees) % 360;
-                mCamera.setDisplayOrientation(resultA);
-            }
-            Camera.Parameters params = mCamera.getParameters();
-            params.setRotation(resultB);
-            mCamera.setParameters(params);
-            mCameraOrientation = resultB;
     }
 
     private void sendToWearable(String path, byte[] data, final ResultCallback<MessageApi.SendMessageResult> callback) {
@@ -313,11 +280,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     }
 
     public void onDeviceConnect() {
-        if(mPreviewRunning & PreferenceUtils.getInstance().cameraOn()) {
-            surfaceCreated(mSurfaceHolder);
-            surfaceChanged(mSurfaceHolder, 0, 0, 0);
-        }
-
         //Get MAC address from DeviceListActivity via intent
         Intent intent = getIntent();
 
@@ -350,103 +312,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             //I send a character when resuming.beginning transmission to check device is connected
             //If it is not an exception will be thrown in the write method and finish() will be called
             mConnectedThread.write("x");
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-
-        if (mPreviewRunning) {
-            mCamera.stopPreview();
-        }
-        if (mSurfaceHolder.getSurface() == null){
-            return;
-        }
-        Camera.Parameters p = mCamera.getParameters();
-        mCamera.setParameters(p);
-        try {
-            if (mCamera != null) {
-                mCamera.setPreviewDisplay(arg0);
-                setCameraDisplayOrientation();
-                mCamera.setPreviewCallback(new Camera.PreviewCallback() {
-                    public void onPreviewFrame(byte[] data, Camera arg1) {
-                        if (mWearableNode != null && readyToProcessImage && mPreviewRunning && displayFrameLag<6 && displayTimeLag<2000
-                                && System.currentTimeMillis() - lastMessageTime < 4000) {
-                            readyToProcessImage = false;
-                            try {
-                                Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
-
-                                if (previewSize != null) {
-                                    int[] rgb = decodeYUV420SP(data, previewSize.width, previewSize.height);
-                                    Bitmap bmp = Bitmap.createBitmap(rgb, previewSize.width, previewSize.height, Bitmap.Config.ARGB_8888);
-                                    int smallWidth, smallHeight;
-                                    int dimension = 200;
-                                    // stream is lagging, cut resolution and catch up
-                                    if (displayTimeLag > 1500) {
-                                        dimension = 50;
-                                    } else if (displayTimeLag > 500) {
-                                        dimension = 100;
-                                    } else {
-                                        dimension = 200;
-                                    }
-                                    if (previewSize.width > previewSize.height) {
-                                        smallWidth = dimension;
-                                        smallHeight = dimension * previewSize.height / previewSize.width;
-                                    } else {
-                                        smallHeight = dimension;
-                                        smallWidth = dimension * previewSize.width / previewSize.height;
-                                    }
-
-                                    Matrix matrix = new Matrix();
-                                    matrix.postRotate(mCameraOrientation);
-
-                                    Bitmap bmpSmall = Bitmap.createScaledBitmap(bmp, smallWidth, smallHeight, false);
-                                    Bitmap bmpSmallRotated = Bitmap.createBitmap(bmpSmall, 0, 0, smallWidth, smallHeight, matrix, false);
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    bmpSmallRotated.compress(Bitmap.CompressFormat.WEBP, 30, baos);
-                                    displayFrameLag++;
-                                    if (PreferenceUtils.getInstance().cameraOn()) {
-                                        boolean[] detected = {true};
-                                        sendToWearable("result", toBytes(detected), null);
-                                        sendToWearable(String.format("show %d", System.currentTimeMillis()), baos.toByteArray(), new ResultCallback<MessageApi.SendMessageResult>() {
-                                            @Override
-                                            public void onResult(MessageApi.SendMessageResult result) {
-                                                if (displayFrameLag > 0) displayFrameLag--;
-                                            }
-                                        });
-                                    }
-                                    bmp.recycle();
-                                    bmpSmall.recycle();
-                                    bmpSmallRotated.recycle();
-                                    readyToProcessImage = true;
-                                }
-                            } catch (RuntimeExecutionException e) {
-                                //Do nothing
-                            }
-                        }
-                    }
-                });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mCamera.startPreview();
-        mCamera.startFaceDetection();
-        mPreviewRunning = true;
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mCamera = Camera.open(currentCamera);
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        mPreviewRunning = false;
-        if (mCamera != null) {
-            mCamera.stopPreview();
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
         }
     }
 

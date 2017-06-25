@@ -42,7 +42,7 @@ public class MenuAdapter extends FragmentGridPagerAdapter {
 
     @Override
     public int getColumnCount(int arg0) {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -56,21 +56,6 @@ public class MenuAdapter extends FragmentGridPagerAdapter {
 
         if(colNum == 0) {
             return mCameraFragment;
-        }
-
-        if(colNum == 1) {
-            final ActionFragment switchAction = ActionFragment.newInstance(currentCameraIcon[currentCamera], currentCameraText[currentCamera]);
-            switchAction.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("blah", "clicked switch");
-                    currentCamera = ( currentCamera + 1 ) % currentCameraText.length;
-                    switchAction.setTextRes(currentCameraText[currentCamera]);
-                    switchAction.setIconRes(currentCameraIcon[currentCamera]);
-                    mHandler.obtainMessage(MESSAGE_SWITCH, currentCamera, -1).sendToTarget();
-                }
-            });
-            return switchAction;
         }
 
         return null;

@@ -2,6 +2,9 @@
 <resources>
 
     <string name="app_name">Companion</string>
+    <string name="viewradar">Viewradar 2.0</string>
+    <string name="overlay_default">U hoeft hier niets te doen. Handelingen gebeuren in de telefoon applicatie.</string>
+    <string name="swipe_right">Veeg naar rechts\nom af te sluiten.</string>
     <string name="action_switch_0">Rear camera</string>
     <string name="action_switch_1">Front camera</string>
     <string name="action_flash_0">Flash off</string>
